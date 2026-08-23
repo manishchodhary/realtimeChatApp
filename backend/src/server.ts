@@ -1,11 +1,14 @@
+import { Server } from "socket.io";
 import app from "./app.js";
 import { env } from "./config/env.js";
-import http, { Server } from "node:http"
+import http from "node:http"
+import { initailizeSocket } from "./socket/socket.server.js";
 
-const server = http.createServer(app);
+const httpserver = http.createServer(app);
 const PORT = env.PORT
+const io = initailizeSocket(httpserver)
 
-server.listen(PORT ,()=>{
+httpserver.listen(PORT ,()=>{
 console.log("Sever is runnig on",PORT);
 
 })
