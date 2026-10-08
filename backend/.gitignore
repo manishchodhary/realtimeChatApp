@@ -1,8 +1,0 @@
-.env
-node_modules
-dist
-/src/generated/prisma
-.agents/skills
-.claude
-.windsurf
-.gitignore

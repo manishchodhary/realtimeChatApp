@@ -29,7 +29,7 @@ export const createMessage = async (
       senderId: true,
       content: true,
       createdAt: true,
-      updatedAt: true,
+      updateAt: true,
     },
   })
   return message;

@@ -19,7 +19,7 @@ export const getOrCreateDirectConversation  = async (
       directKey: directKey,
     },
     include: {
-      members: {
+      conversationMembers: {
         select: {
           userId: true,
         },
@@ -34,7 +34,7 @@ export const getOrCreateDirectConversation  = async (
       data:{
         type:"DIRECT",
         directKey,
-        members:{
+        conversationMembers:{
           create:[
             {userId:currentUserId},
             {userId:otherUserId}
@@ -42,7 +42,7 @@ export const getOrCreateDirectConversation  = async (
         }
       },
      include:{
-      members:{
+    conversationMembers:{
         select:{
           userId:true
         }
@@ -60,7 +60,7 @@ error instanceof Prisma.PrismaClientKnownRequestError &&
           directKey:directKey
         },
         include:{
-          members:{
+          conversationMembers:{
             select:{
               userId:true
             }
