@@ -1,8 +1,7 @@
-
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@repo/db";
 import prisma from "../../lib/prisma.js";
 
-export const getOrCreateDirectConversation  = async (
+export const getOrCreateDirectConversation = async (
   currentUserId: string,
   otherUserId: string,
 ) => {
@@ -10,64 +9,52 @@ export const getOrCreateDirectConversation  = async (
     throw new Error("You cannot create a conversation with yourself");
   }
 
-  const [fristUserId, secondUserId] = [currentUserId, otherUserId].sort();
-
-  const directKey = `${fristUserId}:${secondUserId}`;
+  const [firstUserId, secondUserId] = [currentUserId, otherUserId].sort();
+  const directKey = `${firstUserId}:${secondUserId}`;
 
   const existingConversation = await prisma.conversation.findUnique({
-    where: {
-      directKey: directKey,
-    },
+    where: { directKey },
     include: {
       conversationMembers: {
-        select: {
-          userId: true,
-        },
+        select: { userId: true },
       },
     },
   });
-  if(existingConversation){
+
+  if (existingConversation) {
     return existingConversation;
   }
+
   try {
-    const conversation = await prisma.conversation.create({
-      data:{
-        type:"DIRECT",
+    return await prisma.conversation.create({
+      data: {
+        type: "DIRECT",
         directKey,
-        conversationMembers:{
-          create:[
-            {userId:currentUserId},
-            {userId:otherUserId}
-          ]
-        }
-      },
-     include:{
-    conversationMembers:{
-        select:{
-          userId:true
-        }
-      }
-     }
-    })
-    return conversation;
-  } catch (error) {
-    if(
-error instanceof Prisma.PrismaClientKnownRequestError &&
-      error.code === "P2002"
-    ){
-      const conversation = await prisma.conversation.findUnique({
-        where:{
-          directKey:directKey
+        conversationMembers: {
+          create: [{ userId: currentUserId }, { userId: otherUserId }],
         },
-        include:{
-          conversationMembers:{
-            select:{
-              userId:true
-            }
-          }
-        }
-      })
-      if(conversation){
+      },
+      include: {
+        conversationMembers: {
+          select: { userId: true },
+        },
+      },
+    });
+  } catch (error) {
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === "P2002"
+    ) {
+      const conversation = await prisma.conversation.findUnique({
+        where: { directKey },
+        include: {
+          conversationMembers: {
+            select: { userId: true },
+          },
+        },
+      });
+
+      if (conversation) {
         return conversation;
       }
     }
