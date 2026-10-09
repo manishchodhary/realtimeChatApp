@@ -1,6 +1,8 @@
 export * from "@prisma/client";
 
 import { PrismaClient } from "@prisma/client";
+import {config} from "dotenv"
+config();
 
 const globalForPrisma = globalThis as typeof globalThis & {
   prisma?: PrismaClient;
