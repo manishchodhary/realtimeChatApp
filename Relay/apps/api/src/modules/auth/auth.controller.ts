@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import { loginService, registerService, userService } from "./auth.service.js";
+import { loginService, registerService, userService, listUsersService } from "./auth.service.js";
 import asyncHandler from "../../utils/asyncHandler.js";
 import { string } from "zod";
 
@@ -35,3 +35,7 @@ export const user = asyncHandler(async(req:Request,res:Response)=>{
     data: user,
   });
 })
+export const listUsers = asyncHandler(async (req: Request, res: Response) => {
+  const users = await listUsersService(req.user!.id);
+  res.status(200).json({ success: true, data: users });
+});
