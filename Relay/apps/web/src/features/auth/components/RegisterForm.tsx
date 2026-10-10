@@ -2,7 +2,8 @@ import { useState, type FormEvent } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Eye, EyeOff, LockKeyhole, Mail, UserRound, LoaderCircle } from "lucide-react";
 import { Link } from "react-router-dom";
-import axios from "../../../lib/axios";
+import axios from "axios";
+import api from "../../../lib/axios";
 
 type AuthResponse = {
   success?: boolean;
@@ -60,7 +61,7 @@ function RegisterForm() {
     setLoading(true);
 
     try {
-      const response = await axios.post<AuthResponse>("/auth/register", {
+      const response = await api.post<AuthResponse>("/auth/register", {
         name: cleanName,
         email: cleanEmail,
         password,
