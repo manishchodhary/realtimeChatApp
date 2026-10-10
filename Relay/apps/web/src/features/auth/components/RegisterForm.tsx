@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Eye, EyeOff, LockKeyhole, Mail, UserRound, LoaderCircle } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import api from "../../../lib/axios";
 
@@ -21,6 +21,7 @@ type AuthResponse = {
 };
 
 function RegisterForm() {
+  const navigate = useNavigate();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -77,6 +78,10 @@ function RegisterForm() {
         localStorage.setItem("user", JSON.stringify(result.data.user));
       }
 
+      if (result.data?.accessToken && result.data.user) {
+        navigate("/home", { replace: true });
+        return;
+      }
       setNotice("Your account was created successfully. You can now sign in.");
       setName("");
       setEmail("");
