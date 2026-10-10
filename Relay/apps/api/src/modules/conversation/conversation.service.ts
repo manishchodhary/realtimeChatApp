@@ -62,3 +62,24 @@ export const getOrCreateDirectConversation = async (
     throw error;
   }
 };
+
+
+export const listUserConversations = async (userId: string) => {
+  return prisma.conversation.findMany({
+    where: {
+      conversationMembers: { some: { userId } },
+    },
+    include: {
+      conversationMembers: {
+        where: { userId: { not: userId } },
+        select: { user: { select: { id: true, name: true, email: true } } },
+      },
+      messages: {
+        orderBy: { createdAt: "desc" },
+        take: 1,
+        select: { id: true, content: true, senderId: true, createdAt: true },
+      },
+    },
+    orderBy: { updatedAt: "desc" },
+  });
+};
