@@ -1,6 +1,7 @@
 import type { Server } from "socket.io";
 import prisma from "../lib/prisma.js";
 import type { AppSocket } from "./socket.types.js";
+import { createMessage } from "../modules/messages/messags.service.js";
 
 export const registerSocketHandlers = (io: Server, socket: AppSocket) => {
   const userId = socket.data.userId;
@@ -51,6 +52,21 @@ export const registerSocketHandlers = (io: Server, socket: AppSocket) => {
         success: false,
         error: "Failed to join conversation",
       });
+    }
+  });
+  socket.on("message:send", async (payload, callback) => {
+    try {
+      const message = await createMessage(userId, payload.conversationId, payload.content);
+      io.to(`conversation:${payload.conversationId}`).emit("message:new", {
+        id: message.id,
+        conversationId: message.conversationId,
+        senderId: message.senderId,
+        content: message.content,
+        createdAt: message.createdAt,
+      });
+      callback({ success: true, messageId: message.id });
+    } catch (error) {
+      callback({ success: false, error: error instanceof Error ? error.message : "Unable to send message" });
     }
   });
   socket.on("disconnect", (reason) => {
