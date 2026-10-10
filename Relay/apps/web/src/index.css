@@ -1,7 +1,120 @@
 @import "tailwindcss";
+
+:root {
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #0f172a;
+  background: #f8f7f2;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 html,
 body,
 #root {
-width: 100%;
-min-height: 100vh;
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+}
+
+body {
+  background: #f8f7f2;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:focus-visible,
+input:focus-visible {
+  outline: 3px solid #38bdf8;
+  outline-offset: 3px;
+}
+
+.relay-paper {
+  position: relative;
+  background-color: #f8f7f2;
+  background-image: radial-gradient(rgba(15, 23, 42, 0.09) 0.65px, transparent 0.65px);
+  background-size: 7px 7px;
+}
+
+.relay-logo {
+  position: relative;
+}
+
+.relay-underline::after {
+  position: absolute;
+  right: -0.05em;
+  bottom: -0.04em;
+  left: -0.04em;
+  z-index: -1;
+  height: 0.22em;
+  border-radius: 999px;
+  background: #fde047;
+  content: "";
+  transform: rotate(-2deg);
+}
+
+.relay-pop-in {
+  animation: relay-pop-in 560ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.relay-panel {
+  animation-delay: 80ms;
+}
+
+.relay-loader {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 2px solid #bae6fd;
+  border-top-color: #0284c7;
+  border-radius: 50%;
+  animation: relay-spin 700ms linear infinite;
+}
+
+.relay-loader-light {
+  width: 16px;
+  height: 16px;
+  border-color: rgba(255, 255, 255, 0.35);
+  border-top-color: white;
+}
+
+.relay-chat-surface {
+  background-image: linear-gradient(rgba(14, 165, 233, 0.025) 1px, transparent 1px);
+  background-size: 100% 32px;
+}
+
+@keyframes relay-pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes relay-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
 }
