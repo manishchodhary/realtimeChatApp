@@ -2,8 +2,9 @@ import { useState, type FormEvent } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Eye, EyeOff, LockKeyhole, Mail, LoaderCircle } from "lucide-react";
 import { Link } from "react-router-dom";
+import axios from "../../../lib/axios";
 
-type LoginResponse = {
+type AuthResponse = {
   success?: boolean;
   message?: string;
   error?: string;
@@ -30,7 +31,9 @@ function LoginFrom() {
     setError("");
     setNotice("");
 
-    if (!email.trim() || !password) {
+    const cleanEmail = email.trim().toLowerCase();
+
+    if (!cleanEmail || !password) {
       setError("Enter your email and password to continue.");
       return;
     }
@@ -38,43 +41,38 @@ function LoginFrom() {
     setLoading(true);
 
     try {
-      const apiUrl = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
-      const response = await fetch(`${apiUrl}/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: email.trim().toLowerCase(), password }),
+      const response = await axios.post<AuthResponse>("/auth/login", {
+        email: cleanEmail,
+        password,
       });
+      const result = response.data;
 
-      const result = (await response.json().catch(() => ({}))) as LoginResponse;
-
-      if (!response.ok) {
-        throw new Error(result.message || result.error || "Unable to sign in. Check your details and try again.");
+      if (!result.data?.accessToken || !result.data.user) {
+        throw new Error("The API response did not include a user and access token.");
       }
 
-      if (result.data?.accessToken) {
-        localStorage.setItem("accessToken", result.data.accessToken);
-      }
-
-      if (result.data?.user) {
-        localStorage.setItem("user", JSON.stringify(result.data.user));
-      }
-
-      setNotice("You're signed in. Your session token has been saved.");
+      localStorage.setItem("accessToken", result.data.accessToken);
+      localStorage.setItem("user", JSON.stringify(result.data.user));
+      setNotice("You're signed in successfully.");
     } catch (cause) {
-      setError(
-        cause instanceof TypeError
-          ? "Can't reach the server. Make sure the API is running and VITE_API_URL is correct."
-          : cause instanceof Error
-            ? cause.message
-            : "Something went wrong. Please try again.",
-      );
+      if (axios.isAxiosError<AuthResponse>(cause)) {
+        setError(
+          cause.response?.data?.message ||
+            cause.response?.data?.error ||
+            (cause.code === "ERR_NETWORK"
+              ? "Can't reach the API. Check that your backend is running on port 5000."
+              : "Unable to sign in. Check your details and try again."),
+        );
+      } else {
+        setError(cause instanceof Error ? cause.message : "Something went wrong. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <form onSubmit={handleSubmit} className="mt-8 space-y-5 text-left" noValidate>
+    <form onSubmit={handleSubmit} className="mt-8 space-y-5 text-left">
       <div>
         <label htmlFor="login-email" className="mb-2 block text-sm font-semibold text-slate-700">
           Email address
@@ -96,11 +94,9 @@ function LoginFrom() {
       </div>
 
       <div>
-        <div className="mb-2 flex items-center justify-between gap-3">
-          <label htmlFor="login-password" className="block text-sm font-semibold text-slate-700">
-            Password
-          </label>
-        </div>
+        <label htmlFor="login-password" className="mb-2 block text-sm font-semibold text-slate-700">
+          Password
+        </label>
         <div className="relative">
           <LockKeyhole aria-hidden="true" className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
           <input
