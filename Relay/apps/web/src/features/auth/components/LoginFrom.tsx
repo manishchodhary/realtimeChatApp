@@ -2,7 +2,8 @@ import { useState, type FormEvent } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Eye, EyeOff, LockKeyhole, Mail, LoaderCircle } from "lucide-react";
 import { Link } from "react-router-dom";
-import axios from "../../../lib/axios";
+import axios from "axios";
+import api from "../../../lib/axios";
 
 type AuthResponse = {
   success?: boolean;
@@ -41,7 +42,7 @@ function LoginFrom() {
     setLoading(true);
 
     try {
-      const response = await axios.post<AuthResponse>("/auth/login", {
+      const response = await api.post<AuthResponse>("/auth/login", {
         email: cleanEmail,
         password,
       });
