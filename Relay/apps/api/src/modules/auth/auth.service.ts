@@ -88,3 +88,12 @@ export const userService = async (userId: string) => {
   }
     return user;
 };
+
+export const listUsersService = async (currentUserId: string) => {
+  return prisma.user.findMany({
+    where: { id: { not: currentUserId } },
+    select: { id: true, name: true, email: true },
+    orderBy: { name: "asc" },
+    take: 100,
+  });
+};
