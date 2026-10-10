@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 import asyncHandler from "../../utils/asyncHandler.js";
 import { createDirectConversationSchema } from "./conversation.schema.js";
-import { getOrCreateDirectConversation } from "./conversation.service.js";
+import { getOrCreateDirectConversation, listUserConversations } from "./conversation.service.js";
 
 export const createOrGetDriectCoversation = asyncHandler(
   async (req: Request, res: Response) => {
@@ -22,3 +22,8 @@ export const createOrGetDriectCoversation = asyncHandler(
     });
   },
 );
+
+export const listConversationsController = asyncHandler(async (req: Request, res: Response) => {
+  const conversations = await listUserConversations(req.user!.id);
+  res.status(200).json({ success: true, data: conversations });
+});
