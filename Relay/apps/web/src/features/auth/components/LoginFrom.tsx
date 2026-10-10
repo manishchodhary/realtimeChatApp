@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Eye, EyeOff, LockKeyhole, Mail, LoaderCircle } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import api from "../../../lib/axios";
 
@@ -20,6 +20,7 @@ type AuthResponse = {
 };
 
 function LoginFrom() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -54,7 +55,7 @@ function LoginFrom() {
 
       localStorage.setItem("accessToken", result.data.accessToken);
       localStorage.setItem("user", JSON.stringify(result.data.user));
-      setNotice("You're signed in successfully.");
+      navigate("/home", { replace: true });
     } catch (cause) {
       if (axios.isAxiosError<AuthResponse>(cause)) {
         setError(
